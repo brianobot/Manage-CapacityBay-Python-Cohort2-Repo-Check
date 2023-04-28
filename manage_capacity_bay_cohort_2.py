@@ -1,5 +1,4 @@
-import requests
-from get_repos import get_all_repos, get_repo_by_name
+from repo_functions import get_all_repos, get_repo_by_name, get_repo_content
 from prettytable import PrettyTable
 
 # initialize and clean the student list
@@ -22,19 +21,24 @@ table.field_names = ["Student Name", "Repo Name", 'status', "Created Date"]
 
 for student in students:
     response_data = get_repo_by_name(student, repo_name)
+    # print('Response data = ', response_data)
     
-    if response_data['message'] == "Not Found":
+    if response_data.get('message') == "Not Found":
         print(f"{repo_name} Not FOund! for STudent = {student}")
         table.add_row([student, repo_name, "Not Found", None])
     
-    elif response_data['message'].startswith("API rate limit exceeded for"):
+    elif response_data.get('message', '').startswith("API rate limit exceeded for"):
         print("----------------------------------------------------------------------------")
         print("FAILED! API rate limited! Try Again Later or Use Authenticated API Requests")
         print("----------------------------------------------------------------------------")
 
     else:
-        print('reponse = ', response_data)
+        # print('reponse = ', response_data)
+        # for i in response_data:print(f'{i} = ', response_data[i])
         table.add_row([student, repo_name, "Found", response_data['created_at']])
+
+        repo_content = get_repo_content(student, repo_name, 'README.md')
+        print("Repo Content = ", repo_content)
 
 
 
